@@ -7,13 +7,16 @@ Requirements
 ------------
 
 The ansible module firewalld is used for the configuration.
+Ansible 2.0 is required for source configuration.
 
 Role Variables
 --------------
 
-There are two hashes:
+There are three hashes:
+ - firewalld_zones
  - firewalld_allow_services
  - firewalld_allow_ports
+
 
 Values for firewalld_allow_services:
 
@@ -53,5 +56,5 @@ BSD
 
 Author Information
 ------------------
-
-Marcel Nijenhof <marceln@pion.xs4all.nl>
+Joanna Delaporte
+Original role written by Marcel Nijenhof <marceln@pion.xs4all.nl>
