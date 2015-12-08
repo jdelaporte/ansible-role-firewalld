@@ -9,8 +9,8 @@
 - name: Add firewalld zones and sources from vars
   firewalld:
     zone="{{ item.key }}"
-    source="{% for fwsource in item.value.sources %} {{fwsource}} {% endfor %}"
-    service="{% for fwservice in item.value.services %} {{fwservice}} {% endfor %}"
+    source="{{ item[0] }}"
+    service="{{ item[1] }}"
     state="{{ item.value.state }}"
     permanent="{{ item.value.permanent | default (True) }}"
   with_nested:
