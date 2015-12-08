@@ -8,7 +8,7 @@
 
 - name: Add firewalld zones and sources from vars
   firewalld:
-    zone="{{ item.0.key }}"
+    zone="{{ item.0.name }}"
     source="{{ item.1 }}"
     state="{{ item.0.state }}"
     permanent="{{ item.0.permanent | default (True) }}"
@@ -20,7 +20,7 @@
 
 - name: Add firewalld zones and services from vars
   firewalld:
-    zone="{{ item.0.key }}"
+    zone="{{ item.0.name }}"
     service="{{ item.1 }}"
     state="{{ item.0.state }}"
     permanent="{{ item.0.permanent | default (True) }}"
