@@ -8,14 +8,26 @@
 
 - name: Add firewalld zones and sources from vars
   firewalld:
-    zone="{{ item.key }}"
-    source="{{ item[0] }}"
-    service="{{ item[1] }}"
-    state="{{ item.value.state }}"
-    permanent="{{ item.value.permanent | default (True) }}"
-  with_nested:
-  - "{{ firewalld_zones.item.value.sources }}"
-  - "{{ firewalld_zones.item.value.services }}"
+    zone="{{ item.0.key }}"
+    source="{{ item.1 }}"
+    state="{{ item.0.state }}"
+    permanent="{{ item.0.permanent | default (True) }}"
+    immediate=yes
+  with_subelements:
+  - "firewalld_zones"
+  - "sources"
+  notify: firewalld reload
+
+- name: Add firewalld zones and services from vars
+  firewalld:
+    zone="{{ item.0.key }}"
+    service="{{ item.1 }}"
+    state="{{ item.0.state }}"
+    permanent="{{ item.0.permanent | default (True) }}"
+    immediate=yes
+  with_subelements:
+  - "firewalld_zones"
+  - "services"
   notify: firewalld reload
 
 #- name: Add firewalld rules for services from vars
