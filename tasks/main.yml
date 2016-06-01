@@ -5,6 +5,31 @@
 - name: Ensure firewalld is running and enabled on boot
   service: name=firewalld state=started enabled=yes
 
+# Must use subelements to loop through list of fields
+# that are buried in a dictionary map.
+# When using multiple lists, the first list is 0, second is 1, etc.
+
+- name: Add firewalld public zone without sources from vars
+  firewalld:
+    zone="{{ item.name }}"
+    state="{{ item.state }}"
+    permanent="{{ item.permanent | default (True) }}"
+    immediate=yes
+  with_items:
+  - "{{ firewalld_publiczone }}"
+  notify: firewalld reload
+
+- name: Add firewalld public zone and services from vars
+  firewalld:
+    zone="{{ item.0.name }}"
+    service="{{ item.1 }}"
+    state="{{ item.0.state }}"
+    permanent="{{ item.0.permanent | default (True) }}"
+    immediate=yes
+  with_subelements:
+  - "{{ firewalld_publiczone }}"
+  - services
+  notify: firewalld reload
 
 - name: Add firewalld zones and sources from vars
   firewalld:
@@ -14,20 +39,20 @@
     permanent="{{ item.0.permanent | default (True) }}"
     immediate=yes
   with_subelements:
-  - "firewalld_zones"
-  - "sources"
+  - "{{ firewalld_zones }}"
+  - sources
   notify: firewalld reload
 
 - name: Add firewalld zones and services from vars
   firewalld:
     zone="{{ item.0.name }}"
-    service="{{ item.1 }}"
+    service="{{ item.1}}"
     state="{{ item.0.state }}"
     permanent="{{ item.0.permanent | default (True) }}"
     immediate=yes
   with_subelements:
-  - "firewalld_zones"
-  - "services"
+  - "{{ firewalld_zones }}"
+  - services
   notify: firewalld reload
 
 #- name: Add firewalld rules for services from vars
