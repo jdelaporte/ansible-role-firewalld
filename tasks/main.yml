@@ -1,73 +1,77 @@
 ---
 - name: Install firewalld package
-  yum: pkg=firewalld state=present
+  package: 
+    name: firewalld 
+    state: present
 
 - name: Ensure firewalld is running and enabled on boot
-  service: name=firewalld state=started enabled=yes
+  service: 
+    name: firewalld 
+    state: started
+    enabled: yes
 
 # Must use subelements to loop through list of fields
 # that are buried in a dictionary map.
 # When using multiple lists, the first list is 0, second is 1, etc.
 
-- name: Add firewalld public zone without sources from vars
-  firewalld:
-    zone="{{ item.name }}"
-    state="{{ item.state }}"
-    permanent="{{ item.permanent | default (True) }}"
-    immediate=yes
-  with_items:
-  - "{{ firewalld_publiczone }}"
-  notify: firewalld reload
-
-- name: Add firewalld public zone and services from vars
-  firewalld:
-    zone="{{ item.0.name }}"
-    service="{{ item.1 }}"
-    state="{{ item.0.state }}"
-    permanent="{{ item.0.permanent | default (True) }}"
-    immediate=yes
-  with_subelements:
-  - "{{ firewalld_publiczone }}"
-  - services
-  notify: firewalld reload
+#- name: Add firewalld public zone without sources from vars
+#  firewalld:
+#    zone: "{{ item.name }}"
+#    state: "{{ item.state }}"
+#    permanent: "{{ item.permanent | default (True) }}"
+#    immediate: yes
+#  with_items:
+#  - "{{ firewalld_publiczone }}"
+#  notify: firewalld reload
+#
+#- name: Add firewalld public zone and services from vars
+#  firewalld:
+#    zone: "{{ item.0.name }}"
+#    service: "{{ item.1 }}"
+#    state: "{{ item.0.state }}"
+#    permanent: "{{ item.0.permanent | default (True) }}"
+#    immediate: yes
+#  with_subelements:
+#  - "{{ firewalld_publiczone }}"
+#  - services
+#  notify: firewalld reload
 
 - name: Add firewalld zones and sources from vars
   firewalld:
-    zone="{{ item.0.name }}"
-    source="{{ item.1 }}"
-    state="{{ item.0.state }}"
-    permanent="{{ item.0.permanent | default (True) }}"
-    immediate=yes
+    zone: "{{ item.0.name }}"
+    source: "{{ item.1 }}"
+    state: "{{ item.0.state }}"
+    permanent: "{{ item.0.permanent | default(True) }}"
+    immediate: yes
   with_subelements:
   - "{{ firewalld_zones }}"
   - sources
+  - skip_missing: yes
   notify: firewalld reload
 
 - name: Add firewalld zones and services from vars
   firewalld:
-    zone="{{ item.0.name }}"
-    service="{{ item.1}}"
-    state="{{ item.0.state }}"
-    permanent="{{ item.0.permanent | default (True) }}"
-    immediate=yes
+    zone: "{{ item.0.name }}"
+    service: "{{ item.1 }}"
+    state: "{{ item.0.state }}"
+    permanent: "{{ item.0.permanent | default(True) }}"
+    immediate: yes
   with_subelements:
   - "{{ firewalld_zones }}"
   - services
+  - skip_missing: yes
   notify: firewalld reload
 
-#- name: Add firewalld rules for services from vars
-#  firewalld:
-##    service={{ item.service }}
-##    zone={{ item.zone | default ("public") }}
-#    permanent={{ item.permanent | default (True) }}
-#    state={{ item.state | default ("enabled") }}
-#  with_dict: "{{ firewalld_allow_services }}"
-#  notify: firewalld reload
-#- name: Add firewalld rules for ports from vars
-#  firewalld:
-#    port={{ item.port }}
-#    zone={{ item.zone | default ("public") }}
-#    permanent={{ item.permanent | default (True) }}
-#    state={{ item.state | default ("enabled") }}
-#  with_dict: "{{ firewalld_allow_ports }}"
-#  notify: firewalld reload
+- name: Add firewalld zones and ports from vars
+  firewalld:
+    zone: "{{ item.0.name }}"
+    port: "{{ item.1 }}"
+    state: "{{ item.0.state }}"
+    permanent: "{{ item.0.permanent | default(True) }}"
+    immediate: yes
+  with_subelements:
+  - "{{ firewalld_zones }}"
+  - ports
+  - skip_missing: yes
+  notify: firewalld reload
+
